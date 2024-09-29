@@ -147,7 +147,9 @@ void parser_bulk(std::string cmd){
     }
 }
 
+
 void signal_handler(int signal) {
+
   if (signal == SIGINT) {
 //    (*parser_cmd)("")->log_poket(*logger_to_queue);
     std::cout << "Получен сигнал SIGINT. Завершение работы..." <<std::endl;
