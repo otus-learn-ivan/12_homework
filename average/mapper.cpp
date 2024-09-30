@@ -93,7 +93,9 @@ int main(int argc, char ** argv)
     using namespace std;
     cout << region.get_size() << endl;
     const char* end = begin + region.get_size();
-    size_t size_block = region.get_size()/3;
+    size_t size_block = region.get_size()/10;
+
+    auto startTime = std::chrono::high_resolution_clock::now();
 
     vector<std::future<Thandler_mapper_awerage>> vector_average_fut;
     while(begin < end){
@@ -112,11 +114,18 @@ int main(int argc, char ** argv)
         rez_handler.number_of_numbers+=rez_handler_.number_of_numbers;
         rez_handler.summ_of_numbers+=rez_handler_.summ_of_numbers;
     }
+
+     auto endTime = std::chrono::high_resolution_clock::now();
+     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+     std::cout << "Продолжительность работы функции: " << duration.count() << " мс" << std::endl;
+
     cout << std::fixed <<"\nnumber_of_numbers: " <<rez_handler.number_of_numbers
          <<" summ_of_numbers: "<< rez_handler.summ_of_numbers
          <<" "<< static_cast<double>(rez_handler.summ_of_numbers) /100
          <<" "<< static_cast<double>(rez_handler.summ_of_numbers) / 100
         / static_cast<double>(rez_handler.number_of_numbers) << endl;
+
+
 
 #if 0
     std::vector<Tthread_mapper< Thandler_mapper_awerage>>thread_mapper;
