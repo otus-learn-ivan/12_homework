@@ -7,11 +7,13 @@
 #include <boost/asio.hpp>
 #include <sstream>
 
+#if 1
 using namespace std;
 //--------------------------------------------------------------------------
 class Tlogger{
 public:
     virtual void print(size_t tiks_start,string b)=0;
+    virtual ~Tlogger() = default;
 };
 //--------------------------------------------------------------------------
 class Tlogger_to_file: public Tlogger{
@@ -133,7 +135,7 @@ unique_ptr<Tpoket> Tparser_cmd::operator()(string&& cmd){
 //--------------------------------------------------------------------------
 
 unique_ptr <Tparser_cmd> parser_cmd;
-unique_ptr <Tlogger_to_queue> logger_to_queue;
+std::unique_ptr <Tlogger_to_queue> logger_to_queue;
 
 void parser_bulk(std::string cmd){
     if(cmd.size()==0)(*parser_cmd)("")->log_poket(*logger_to_queue);
@@ -169,3 +171,4 @@ int main(int argc, char* argv[])
 #endif
     return 0;
 }
+#endif

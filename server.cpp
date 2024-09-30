@@ -1,3 +1,4 @@
+
 //#include <boost/thread/thread.hpp>
 #include <boost/thread.hpp>
 #include <iostream>
@@ -6,6 +7,7 @@
 #include <thread>
 #include <signal.h>
 
+#if 1
 using namespace tp_network_client;
 
 bool g_authed = false;
@@ -152,4 +154,4 @@ int main_client_server(const unsigned short g_port_num_) {
     server_task.join(); // Ожидание завершения потока
     return 0;
 }
-
+#endif
