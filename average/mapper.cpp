@@ -65,9 +65,9 @@ struct Thandler_mapper_awerage{
     double number; strm >> number;
     summ_of_numbers += static_cast<long long>(number*100);
     number_of_numbers++;
-//    if(number_of_numbers%1000 ==0){
-//        std::cout << this <<" number_of_numbers:" << number_of_numbers << " summ_of_numbers: "<< summ_of_numbers <<"\n";
-//    }
+    if(number_of_numbers%1000 ==0){
+        std::cout << this <<" number_of_numbers:" << number_of_numbers << " summ_of_numbers: "<< summ_of_numbers <<"\n";
+    }
   }
   Thandler_mapper_awerage(Thandler_mapper_awerage&& oner) = default;
   Thandler_mapper_awerage(Thandler_mapper_awerage& oner) = default;
@@ -77,9 +77,10 @@ template <typename Thandler_mapper>
 struct Tmapper{
     size_t count_theread;
     Tmapper (size_t count_theread):count_theread(count_theread){}
-      std::vector<Thandler_mapper>  start_mapper(){
+      std::vector<Thandler_mapper>  start_mapper(const char* path){
         using namespace std;
-        boost::filesystem::path filename("AB_NYC_2019.csv");
+//        boost::filesystem::path filename("AB_NYC_2019.csv");
+        boost::filesystem::path filename(path);
         const boost::interprocess::mode_t mode = boost::interprocess::read_only;
         boost::interprocess::file_mapping fm(filename.c_str(), mode);
         boost::interprocess::mapped_region region(fm, mode, 0, 0);
@@ -106,15 +107,32 @@ struct Tmapper{
     }
 };
 
+const size_t default_numbers_of_thread =5;
+
 int main(int argc, char ** argv)
 {
+    std::cerr << " HELLO MAPPER    !"<<  std::endl;
+
     using namespace  std;
+    string line;
+    std::getline(std::cin, line);
+//    while (std::getline(std::cin, line))
+//    {
+//        std::cout <<"line: " << line << std::endl;
+//    }
+
+    std::cerr << "path: "<< line << "   !"<<  std::endl;
+
+    sleep(1);
+
+
 
 //    auto startTime = std::chrono::high_resolution_clock::now();
 
-    Tmapper<Thandler_mapper_awerage> mapper_awerage(atoi(argv[1]));
+    size_t number_threads = argc>1?atoi(argv[1]):default_numbers_of_thread;
+    Tmapper<Thandler_mapper_awerage> mapper_awerage(number_threads);
     std::vector<Thandler_mapper_awerage> mapper_awerage_answer{
-            mapper_awerage.start_mapper()};
+            mapper_awerage.start_mapper(line.c_str())};
 
 //    auto endTime = std::chrono::high_resolution_clock::now();
 //    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
