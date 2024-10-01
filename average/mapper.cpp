@@ -10,8 +10,65 @@
 #include <cassert>
 #include <thread>
 #include <memory>
-
 #include <future>
+
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
+
+template <class T>
+struct Tthreadsafe_queue {
+  std::mutex mutex;
+  std::condition_variable_any cv;
+  std::queue<T> data_queue;
+};
+
+template <class T>
+class Tproducer{
+  std::shared_ptr<Tthreadsafe_queue <T>> qu;
+public:
+  Tproducer(std::shared_ptr<Tthreadsafe_queue <T>> q):qu(q){}
+  static Tproducer Creator(std::shared_ptr<Tthreadsafe_queue <T>> q){
+    return Tproducer(q);
+  }
+  void push(T value) {
+    std::lock_guard<std::mutex> lock(qu->mutex);
+    qu->data_queue.push(std::move(value));
+    qu->cv.notify_all(); // Сигнализируем о доступном элементе
+  }
+};
+
+
+template <class Tmessage>
+class Tconsumer{
+  const size_t  id;
+  std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>> qu;
+  std::function<void(size_t,std::unique_ptr<Tmessage>) > action;
+public:
+  Tconsumer(const size_t  ID,std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>>& q, std::function<void(size_t, std::unique_ptr<Tmessage>)> act):
+  id(ID), qu(q), action(act){}
+  void operator()(std::stop_token stopToken){
+      while (1) {
+          {
+              {
+                  std::unique_lock<std::mutex> lock(qu->mutex);
+                  qu->cv.wait(lock,stopToken, [this] { return !qu->data_queue.empty(); }); // Ждем, пока очередь не будет пуста
+                  if(stopToken.stop_requested()&&qu->data_queue.empty()){
+                     return;
+                  }
+                  action(id,std::move(qu->data_queue.front()));
+                  qu->data_queue.pop();
+              }
+          }
+      }
+  }
+  ~Tconsumer(){
+      //std::cout << "~Tproducer() destroy" << std::endl;
+  }
+};
+
+
 class Tget_point_to_n_tg{
   size_t number_tg;
   char seporator;
@@ -114,19 +171,30 @@ int main(int argc, char ** argv)
     std::cerr << " HELLO MAPPER    !"<<  std::endl;
 
     using namespace  std;
+    auto qu_in = std::make_shared<Tthreadsafe_queue <std::unique_ptr<string>>>();
+    auto qu_out = std::make_shared<Tthreadsafe_queue <std::unique_ptr<string>>>();
+
+//    Tconsumer<string> aaa {1,qu_in,[](size_t id,std::unique_ptr<string>){;}};
+    auto action_av =  [&qu_out](size_t id,std::unique_ptr<string> p_to_str){
+        cout <<"id: "<< id<<" " << *p_to_str;
+    };
+    auto th1 = std::jthread(Tconsumer<string>{1,qu_in,action_av});
+//    auto th1 = std::jthread(Tconsumer<string>{1,qu_in,[](size_t id,std::unique_ptr<string>){;}});
+//    auto th1 = std::jthread(Tconsumer{1,qu_in,
+//                                [](size_t id,std::unique_ptr<string>){;}});
+
     string line;
-    std::getline(std::cin, line);
-//    while (std::getline(std::cin, line))
-//    {
-//        std::cout <<"line: " << line << std::endl;
-//    }
+    while (std::getline(std::cin, line))
+    {
+        std::cout <<"line: " << line << std::endl;
+        Tproducer<std::unique_ptr<string>>::Creator(qu_in).push(std::make_unique<string>(line));//.push(line);
+    }
 
-    std::cerr << "path: "<< line << "   !"<<  std::endl;
-
-    sleep(1);
+    th1.join();
 
 
 
+#if 0
 //    auto startTime = std::chrono::high_resolution_clock::now();
 
     size_t number_threads = argc>1?atoi(argv[1]):default_numbers_of_thread;
@@ -140,7 +208,7 @@ int main(int argc, char ** argv)
     for(auto& answer:mapper_awerage_answer){
         std::cout << answer.number_of_numbers <<" " << answer.summ_of_numbers <<"\n";
     }
-
+#endif
 #if 0
     Thandler_mapper_awerage rez_handler;
     for(auto rez_handler_:mapper_awerage_answer){
