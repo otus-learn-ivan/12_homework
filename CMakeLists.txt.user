@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 6.0.2, 2024-09-30T09:02:01. -->
+<!-- Written by QtCreator 6.0.2, 2024-10-01T09:25:52. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -102,7 +102,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{58f15fe6-874b-4ce0-9457-0628a2472284}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
+   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">3</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
     <value type="QString" key="CMake.Build.Type">Debug</value>
     <value type="QString" key="CMake.Initial.Parameters">-GUnix Makefiles
@@ -323,6 +323,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">mapper_av</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.mapper_av</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">mapper_av</value>
+    <value type="QString" key="RunConfiguration.Arguments">10</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
@@ -358,6 +359,17 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">reducer_av</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.reducer_av</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">reducer_av</value>
+    <value type="QString" key="RunConfiguration.Arguments">4976 87480100
+5035 74716900
+5060 72053659
+4847 71035300
+4823 64769070
+4827 67999919
+4803 70261171
+4798 73849000
+4789 74886900
+4937 89227009</value>
+    <value type="bool" key="RunConfiguration.Arguments.multi">true</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
