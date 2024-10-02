@@ -11,9 +11,6 @@ struct Thandler_mapper_awerage{
     double number; strm >> number;
     summ_of_numbers += static_cast<long long>(number*100);
     number_of_numbers++;
-//    if(number_of_numbers%1000 ==0){
-//        std::cout << this <<" "<<  strm.str() <<" number_of_numbers:" << number_of_numbers << " summ_of_numbers: "<< summ_of_numbers <<"\n";
-//    }
   }
   Thandler_mapper_awerage(Thandler_mapper_awerage&& oner) = default;
   Thandler_mapper_awerage(Thandler_mapper_awerage& oner) = default;
@@ -33,13 +30,5 @@ int main(int argc, char ** argv)
         cout << m_handler_av->get_handler().number_of_numbers << " "
              << m_handler_av->get_handler().summ_of_numbers   << endl;
     }
-
-//    Thandler_mapper_awerage sum;
-//    for(auto& m_handler_av: *v_hand_mapp_awerag){
-//        sum.number_of_numbers += m_handler_av->get_handler().number_of_numbers;
-//        sum.summ_of_numbers += m_handler_av->get_handler().summ_of_numbers;
-//    }
-//    cout << sum.number_of_numbers <<" " << sum.summ_of_numbers << " "
-//         << sum.summ_of_numbers / sum.number_of_numbers / 100.0 <<"\n";
     return 0;
 }

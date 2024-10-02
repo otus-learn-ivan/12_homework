@@ -12,9 +12,6 @@ struct Thandler_mapper_dispersion{
   void operator()(std::stringstream& strm){
     double number; strm >> number;
     map_ds[number]++;
-//    if(number_of_numbers%1000 ==0){
-//        std::cout << this <<" number_of_numbers:" << number_of_numbers << " summ_of_numbers: "<< summ_of_numbers <<"\n";
-//    }
   }
   Thandler_mapper_dispersion(Thandler_mapper_dispersion&& oner) = default;
   Thandler_mapper_dispersion(Thandler_mapper_dispersion& oner) = default;
