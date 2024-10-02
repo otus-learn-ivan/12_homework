@@ -46,7 +46,8 @@ class Tconsumer{
   std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>> qu;
   std::function<void(size_t,std::unique_ptr<Tmessage>) > action;
 public:
-  Tconsumer(const size_t  ID,std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>>& q, std::function<void(size_t, std::unique_ptr<Tmessage>)> act):
+  Tconsumer(const size_t  ID,std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>>& q,
+            std::function<void(size_t, std::unique_ptr<Tmessage>)> act):
   id(ID), qu(q), action(act){}
   void operator()(std::stop_token stopToken){
       while (1) {
@@ -86,32 +87,27 @@ public:
   }
 };
 
-template <class Thandler,class Titer = const char*,class Tseporator = Tget_point_to_n_tg>
+template <class Thandler,class Tseporator = Tget_point_to_n_tg>
 class Tthread_mapper{
   Thandler handler_of_elm;
-  Titer begin, end;
   size_t num_colum;
   char seporator;
 public:
-  Tthread_mapper(Titer bg, Titer end,size_t num_colum =9 ,char seporator = '\n') :handler_of_elm{}, begin{bg}, end{end}, num_colum{num_colum}, seporator{seporator}{}
-  Thandler operator()(){
-    auto end_line = begin;
-    while (end_line < end) {
-      auto begin_line = end_line;
-      end_line = std::find(end_line, end, '\n');
-      std::stringstream strm{Tseporator::factory(num_colum,seporator)(begin_line, end_line)};
+  Tthread_mapper(size_t num_colum =9 ,char seporator = '\n') :handler_of_elm{},num_colum{num_colum}, seporator{seporator}{}
+  void operator()(std::unique_ptr<std::string> p_str){
+      std::stringstream strm{
+          Tseporator::factory(num_colum,seporator)(p_str->begin(),p_str->end()).base()
+      };
       handler_of_elm(strm);
-      end_line++;
-    }
-    return handler_of_elm;
-  }
-  static Tthread_mapper creator(Titer bg, Titer end, size_t num_colum = 9, char seporator = '\n'){
-//    std::cout << "creator bg:" << (void*)bg <<  " end:" << (void*)end << " num_colum: " <<num_colum << " seporator: " << seporator << "\n";
-    return Tthread_mapper(bg, end, num_colum, seporator);
   }
   Thandler& get_handler(){
       return handler_of_elm;
   }
+  std::function<void(size_t, std::unique_ptr<std::string>)> to_function() {
+             return [this](size_t id, std::unique_ptr<std::string> p_str) {
+                 (*this)(std::move(p_str));
+             };
+         }
 };
 
 struct Thandler_mapper_awerage{
@@ -122,77 +118,75 @@ struct Thandler_mapper_awerage{
     double number; strm >> number;
     summ_of_numbers += static_cast<long long>(number*100);
     number_of_numbers++;
-    if(number_of_numbers%1000 ==0){
-        std::cout << this <<" number_of_numbers:" << number_of_numbers << " summ_of_numbers: "<< summ_of_numbers <<"\n";
-    }
+//    if(number_of_numbers%1000 ==0){
+//        std::cout << this <<" number_of_numbers:" << number_of_numbers << " summ_of_numbers: "<< summ_of_numbers <<"\n";
+//    }
+
   }
   Thandler_mapper_awerage(Thandler_mapper_awerage&& oner) = default;
   Thandler_mapper_awerage(Thandler_mapper_awerage& oner) = default;
-};
-
-template <typename Thandler_mapper>
-struct Tmapper{
-    size_t count_theread;
-    Tmapper (size_t count_theread):count_theread(count_theread){}
-      std::vector<Thandler_mapper>  start_mapper(const char* path){
-        using namespace std;
-//        boost::filesystem::path filename("AB_NYC_2019.csv");
-        boost::filesystem::path filename(path);
-        const boost::interprocess::mode_t mode = boost::interprocess::read_only;
-        boost::interprocess::file_mapping fm(filename.c_str(), mode);
-        boost::interprocess::mapped_region region(fm, mode, 0, 0);
-        const char* begin = static_cast<const char*>(region.get_address());
-//        cout << region.get_size() << endl;
-        const char* end = begin + region.get_size();
-        size_t size_block = region.get_size()/count_theread;
-        vector<std::future<Thandler_mapper>> vector_average_fut;
-        while(begin < end){
-            auto end_block = find(
-                        begin + size_block > end?end:begin + size_block,
-                        end,'\n');
-//            cout << "begin: " << (void*)begin << " end_block:" << (void*)end_block <<"\n"  ;
-            vector_average_fut.push_back(std::async(std::launch::async,Tthread_mapper< Thandler_mapper_awerage>::creator(begin, end_block)));
-            begin = end_block+1;
-        }
-
-        std::vector<Thandler_mapper> rez_handler;
-
-        for(auto&rez_handler_fut:vector_average_fut){
-            rez_handler.emplace_back(rez_handler_fut.get());//(answ);
-        }
-        return rez_handler;
-    }
 };
 
 const size_t default_numbers_of_thread =5;
 
 int main(int argc, char ** argv)
 {
-    std::cerr << " HELLO MAPPER    !"<<  std::endl;
-
     using namespace  std;
     auto qu_in = std::make_shared<Tthreadsafe_queue <std::unique_ptr<string>>>();
-    auto qu_out = std::make_shared<Tthreadsafe_queue <std::unique_ptr<string>>>();
+//    auto qu_out = std::make_shared<Tthreadsafe_queue <std::unique_ptr<string>>>();
 
-//    Tconsumer<string> aaa {1,qu_in,[](size_t id,std::unique_ptr<string>){;}};
-    auto action_av =  [&qu_out](size_t id,std::unique_ptr<string> p_to_str){
-        cout <<"id: "<< id<<" " << *p_to_str;
-    };
-    auto th1 = std::jthread(Tconsumer<string>{1,qu_in,action_av});
-//    auto th1 = std::jthread(Tconsumer<string>{1,qu_in,[](size_t id,std::unique_ptr<string>){;}});
-//    auto th1 = std::jthread(Tconsumer{1,qu_in,
-//                                [](size_t id,std::unique_ptr<string>){;}});
-
+//    Tthread_mapper<Thandler_mapper_awerage> m_handler_av1{};
+//    auto th1 = std::jthread(Tconsumer<string>{0,qu_in,m_handler_av1.to_function()});
+//    Tthread_mapper<Thandler_mapper_awerage> m_handler_av2{};
+//    auto th2 = std::jthread(Tconsumer<string>{1,qu_in,m_handler_av2.to_function()});
+    size_t number_threads = argc>1?atoi(argv[1]):default_numbers_of_thread;
+    std::vector<std::unique_ptr<Tthread_mapper<Thandler_mapper_awerage>>> v_hand_mapp_awerag;
+    std::vector<std::jthread> threads;
+    for(size_t i=0;i<number_threads;i++){
+        v_hand_mapp_awerag.push_back(
+            std::make_unique<Tthread_mapper<Thandler_mapper_awerage>>(Tthread_mapper<Thandler_mapper_awerage>{})
+                    );
+        threads.push_back(std::jthread(Tconsumer<string> {i,qu_in,v_hand_mapp_awerag[i]->to_function()}));
+    }
     string line;
     while (std::getline(std::cin, line))
     {
-        std::cout <<"line: " << line << std::endl;
         Tproducer<std::unique_ptr<string>>::Creator(qu_in).push(std::make_unique<string>(line));//.push(line);
     }
 
-    th1.join();
+    for (auto& thread : threads) {
+        thread.request_stop();
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+//    Thandler_mapper_awerage summ_average;
+    for(auto& m_handler_av: v_hand_mapp_awerag){
+//        summ_average.summ_of_numbers+=m_handler_av->get_handler().summ_of_numbers;
+//        summ_average.number_of_numbers+=m_handler_av->get_handler().number_of_numbers;
+        auto& handler_av= m_handler_av->get_handler();
+        cout << handler_av.number_of_numbers
+             <<" " << handler_av.summ_of_numbers
+             // <<" " << handler_av.summ_of_numbers/handler_av.number_of_numbers/100.0
+             << endl;
+    }
+//    cout <<"END " << summ_average.number_of_numbers
+//         <<" " << summ_average.summ_of_numbers
+//         <<" " << summ_average.summ_of_numbers/summ_average.number_of_numbers/100.0
+//         << endl;
 
-
+//    th1.request_stop();
+//    th1.join();
+//    auto& handler_av  = m_handler_av1.get_handler();
+//    cout << "END " << handler_av.number_of_numbers
+//         <<" " << handler_av.summ_of_numbers
+//         <<" " << handler_av.summ_of_numbers/handler_av.number_of_numbers/100.0
+//         << endl;
+//    auto& handler_av2  = m_handler_av2.get_handler();
+//    cout << "END " << handler_av2.number_of_numbers
+//         <<" " << handler_av2.summ_of_numbers
+//         <<" " << handler_av2.summ_of_numbers/handler_av2.number_of_numbers/100.0
+//         << endl;
 
 #if 0
 //    auto startTime = std::chrono::high_resolution_clock::now();
