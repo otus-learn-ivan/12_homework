@@ -11,7 +11,7 @@ public:
   template<class Titer>
   Titer operator()(Titer begin,Titer end){
     auto piont_to_n_seporator  = std::find_if(begin, end, [this](const char& ch)
-    { number_tg = ch == ',' ? number_tg - 1 : number_tg;
+    { number_tg = ch == seporator ? number_tg - 1 : number_tg;
       return number_tg == 0; });
     return ++piont_to_n_seporator;
   }
@@ -26,7 +26,7 @@ class Tthread_mapper{
   size_t num_colum;
   char seporator;
 public:
-  Tthread_mapper(size_t num_colum =9 ,char seporator = '\n') :handler_of_elm{},num_colum{num_colum}, seporator{seporator}{}
+  Tthread_mapper(size_t num_colum =9 ,char seporator = ',') :handler_of_elm{},num_colum{num_colum}, seporator{seporator}{}
   void operator()(std::unique_ptr<std::string> p_str){
       std::stringstream strm{
           Tseporator::factory(num_colum,seporator)(p_str->begin(),p_str->end()).base()
@@ -55,7 +55,7 @@ procces(size_t number_threads){
     std::vector<std::jthread> threads;
     for(size_t i=0;i<number_threads;i++){
         v_hand_mapp_awerag->push_back(std::make_unique<Tthread>(Tthread{}));
-        threads.push_back(std::jthread(Tconsumer<string> {i,qu_in,(*v_hand_mapp_awerag)[i]->to_function()}));
+        threads.push_back(std::jthread(Tconsumer<string> {qu_in,(*v_hand_mapp_awerag)[i]->to_function()}));
     }
     string line;
     while (std::getline(std::cin, line))
@@ -68,7 +68,7 @@ procces(size_t number_threads){
             thread.join();
         }
     }
-    return  v_hand_mapp_awerag;
+    return  std::move(v_hand_mapp_awerag);
 }
 
 #endif // MAPPER_ALL_H

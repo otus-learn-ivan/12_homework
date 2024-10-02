@@ -45,7 +45,7 @@ class Tconsumer{
   std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>> qu;
   std::function<void(std::unique_ptr<Tmessage>)>action;
 public:
-  Tconsumer(const size_t  ID,std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>>& q,
+  Tconsumer(std::shared_ptr<Tthreadsafe_queue <std::unique_ptr<Tmessage>>>& q,
             std::function<void(std::unique_ptr<Tmessage>)> act):qu(q), action(act){}
   void operator()(std::stop_token stopToken){
       while (1) {
