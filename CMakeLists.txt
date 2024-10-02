@@ -24,8 +24,8 @@ add_executable(bulk_server main.cpp
 
 add_executable(test_bulk test_bulk.cpp)
 
-add_executable(mapper_av average/mapper.cpp)
-add_executable(mapper_ds dispersion/mapper.cpp)
+add_executable(mapper_av average/mapper.cpp produser_consumer.h mapper_all.h)
+add_executable(mapper_ds dispersion/mapper.cpp produser_consumer.h mapper_all.h)
 add_executable(reducer_av average/reducer.cpp)
 add_executable(reducer_ds dispersion/reducer.cpp)
 add_executable(test_average average/test_average.cpp)
