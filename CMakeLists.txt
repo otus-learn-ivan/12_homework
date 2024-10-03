@@ -28,8 +28,8 @@ add_executable(mapper_av average/mapper.cpp produser_consumer.h mapper_all.h)
 add_executable(mapper_ds dispersion/mapper.cpp produser_consumer.h mapper_all.h)
 add_executable(reducer_av average/reducer.cpp)
 add_executable(reducer_ds dispersion/reducer.cpp)
-add_executable(test_average average/test_average.cpp)
-add_executable(test_dispersion dispersion/test_dispersion.cpp)
+add_executable(test_average average/test_average.cpp test_str_file.cpp test_str_file.h)
+add_executable(test_dispersion dispersion/test_dispersion.cpp test_str_file.cpp test_str_file.h)
 
 
 #set_target_properties(bulk_server test_bulk async mapper_av mapper_ds reducer_av reducer_ds test_average test_dispersion PROPERTIES
