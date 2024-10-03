@@ -68,7 +68,7 @@ procces(size_t number_threads){
             thread.join();
         }
     }
-    return  std::move(v_hand_mapp_awerag);
+    return  v_hand_mapp_awerag;
 }
 
 #endif // MAPPER_ALL_H
