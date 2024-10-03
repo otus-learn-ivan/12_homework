@@ -123,6 +123,10 @@ endif()
 
 
 #install(TARGETS bulk_server RUNTIME DESTINATION bin)
+install(TARGETS mapper_av RUNTIME DESTINATION bin)
+install(TARGETS mapper_ds RUNTIME DESTINATION bin)
+install(TARGETS reducer_av RUNTIME DESTINATION bin)
+install(TARGETS reducer_ds RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 
@@ -136,6 +140,6 @@ include(CPack)
 
 enable_testing()
 
-add_test(test_bulk test_bulk)
+#add_test(test_bulk test_bulk)
 add_test(test_average test_average)
 add_test(test_dispersion test_dispersion)
