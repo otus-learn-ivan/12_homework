@@ -24,8 +24,10 @@ jobs:
       - run: cmake --build .
       - run: cmake --build . --target test
       - run: cmake --build . --target package  
-      - name: Run test_bulk 
-        run: ./test_bulk
+      - name: Run test_average 
+        run: ./test_average
+      - name: Run test_dispersion 
+        run: ./test_dispersion
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -43,7 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bulk_server_prg-0.1.${{ github.run_number }}-Linux.deb
-          asset_name: bulk_server_prg-0.1.${{ github.run_number }}-Linux.deb
+          asset_path: ./mapper_reducer_prg-0.1.${{ github.run_number }}-Linux.deb
+          asset_name: mapper_reducer_prg-0.1.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
 
