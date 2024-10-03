@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_test_ds)
 }
 
 BOOST_AUTO_TEST_CASE(test_valid){
-    system ("cat ../AB_NYC_2019.csv | ./mapper_ds | sort -k1 |./reducer_ds > output_ds");
+    system ("cat ${GITHUB_WORKSPACE}/AB_NYC_2019.csv | ./mapper_ds | sort -k1 |./reducer_ds > output_ds");
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     BOOST_CHECK(test_str_file("output_ds","57679.7"));
 }
