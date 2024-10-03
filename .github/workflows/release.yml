@@ -23,7 +23,7 @@ jobs:
       - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
       - run: set -x
       - run: cmake --build .
-      #- run: cmake --build . --target test
+      - run: cmake --build . --target test
       - run: cmake --build . --target package  
       - name: Run test_average 
         run: ./test_average
